@@ -1,0 +1,20 @@
+name: Build dde clipboard
+on: push
+
+jobs:
+  build:
+    name: Build clipboard
+    runs-on: ubuntu-18.04
+    container: daze456/deepin-desktop:latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Build
+        run: bash build_action.sh
+
+      - name: Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: artifact
+          path: ${{ github.workspace }}/artifact/
