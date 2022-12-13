@@ -1,0 +1,114 @@
+Subject: [PATCH] select history item by press 'Enter' key.
+---
+Index: dde-clipboard/itemwidget.cpp
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/dde-clipboard/itemwidget.cpp b/dde-clipboard/itemwidget.cpp
+--- a/dde-clipboard/itemwidget.cpp	(revision 8d4ab91498fddd5aab9604028f7031440dd8593b)
++++ b/dde-clipboard/itemwidget.cpp	(revision b85d9b13e8fa0d2058b5ea8c2aef8b4255d8918f)
+@@ -599,6 +599,37 @@
+     return pix;
+ }
+
++void ItemWidget::onSelect()
++{
++    if (!m_data->dataEnabled()) {
++        return;
++    }
++
++    if (m_data->type() == File) {
++        QList<QUrl> urls = m_data->urls();
++        bool has = false;
++        foreach (auto url, urls) {
++            if (QDir().exists(url.toLocalFile())) {
++                has = true;
++            }
++        }
++        if (!has) {
++            m_data->setDataEnabled(false);
++            //源文件被删除需要提示
++            m_contentLabel->setEnabled(false);
++            QFontMetrics metrix = m_statusLabel->fontMetrics();
++            QString tips = tr("(File deleted)");
++            int tipsWidth = metrix.width(tips);
++            QString text = metrix.elidedText(m_statusLabel->text(), Qt::ElideMiddle, WindowWidth - 2 * ItemMargin - 10 - tipsWidth, 0);
++            m_statusLabel->setText(text + tips);
++
++            return;
++        }
++    }
++
++    m_data->popTop();
++}
++
+ void ItemWidget::keyPressEvent(QKeyEvent *event)
+ {
+     switch (event->key()) {
+@@ -613,6 +644,8 @@
+     case Qt::Key_Return: {
+         if (m_closeFocus) {
+             onClose();
++        } else {
++            onSelect();
+         }
+     }
+     break;
+@@ -654,34 +687,7 @@
+
+ void ItemWidget::mouseDoubleClickEvent(QMouseEvent *event)
+ {
+-    if (!m_data->dataEnabled()) {
+-        return DWidget::mousePressEvent(event);
+-    }
+-
+-    if (m_data->type() == File) {
+-        QList<QUrl> urls = m_data->urls();
+-        bool has = false;
+-        foreach (auto url, urls) {
+-            if (QDir().exists(url.toLocalFile())) {
+-                has = true;
+-            }
+-        }
+-        if (!has) {
+-            m_data->setDataEnabled(false);
+-            //源文件被删除需要提示
+-            m_contentLabel->setEnabled(false);
+-            QFontMetrics metrix = m_statusLabel->fontMetrics();
+-            QString tips = tr("(File deleted)");
+-            int tipsWidth = metrix.width(tips);
+-            QString text = metrix.elidedText(m_statusLabel->text(), Qt::ElideMiddle, WindowWidth - 2 * ItemMargin - 10 - tipsWidth, 0);
+-            m_statusLabel->setText(text + tips);
+-
+-            return DWidget::mousePressEvent(event);
+-        }
+-    }
+-
+-    m_data->popTop();
+-
++    onSelect();
+     return DWidget::mousePressEvent(event);
+ }
+
+Index: dde-clipboard/itemwidget.h
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/dde-clipboard/itemwidget.h b/dde-clipboard/itemwidget.h
+--- a/dde-clipboard/itemwidget.h	(revision 8d4ab91498fddd5aab9604028f7031440dd8593b)
++++ b/dde-clipboard/itemwidget.h	(revision b85d9b13e8fa0d2058b5ea8c2aef8b4255d8918f)
+@@ -141,6 +141,12 @@
+
+     double getOpacity() const { return 0.0; }
+
++    /*!
++     * \~chinese \name onSelect
++     * \~chinese \brief 当内容被选中时执行的函数
++     */
++    void onSelect();
++
+ private:
+     QPointer<ItemData> m_data;
+

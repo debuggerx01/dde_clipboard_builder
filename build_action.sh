@@ -14,6 +14,7 @@ git clone https://github.com/linuxdeepin/dde-clipboard.git --branch $TAG
 
 cd dde-clipboard || exit
 
+git am ../handle_enter_key.patch
 
 apt build-dep -y .
 apt install -y qt5-default
@@ -21,13 +22,14 @@ apt install -y qt5-default
 mkdir build
 
 cd build || exit
-cmake ..
-
+cmake -D CMAKE_BUILD_TYPE=Release ..
 CPU_CORES=$(($(grep -c processor < /proc/cpuinfo)*2))
 
 make -j"$CPU_CORES"
 
 ls
+
+strip dde-clipboard
 
 cd ..
 cd ..
