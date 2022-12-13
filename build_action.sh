@@ -16,6 +16,7 @@ cd dde-clipboard || exit
 
 
 apt build-dep -y .
+apt install -y qt5-default
 
 mkdir build
 
