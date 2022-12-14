@@ -8,6 +8,9 @@ apt update
 # apt install -y git libdtkcore-dev libdtkgui-dev libdtkwidget-dev
 apt install -y git
 
+git config --global user.email "dx8917312@163.com"
+git config --global user.name "debuggerx"
+
 TAG="5.4.24"
 
 git clone https://github.com/linuxdeepin/dde-clipboard.git --branch $TAG
