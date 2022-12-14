@@ -16,6 +16,8 @@ cd dde-clipboard || exit
 
 git am ../handle_enter_key.patch
 
+git status
+
 apt build-dep -y .
 apt install -y qt5-default
 
